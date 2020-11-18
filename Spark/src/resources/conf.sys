@@ -1,0 +1,16 @@
+# Tag Source Of MySQL
+mysql.source.tag.url=jdbc:mysql://192.168.1.16:3306/feed_stream
+mysql.source.tag.username=datacenter
+mysql.source.tag.password=G4,RNQgAj4Q
+
+# User and Tag Source Of CH
+ch.source.user_tag.driver=ru.yandex.clickhouse.ClickHouseDriver
+ch.source.user_tag.url=jdbc:clickhouse://192.168.1.33:8123
+ch.source.user_tag.username=default
+ch.source.user_tag.password=Lb5NcL09
+
+# Suggestion For User Of CH
+ch.source.user_tag.driver=ru.yandex.clickhouse.ClickHouseDriver
+ch.source.user_tag.url=jdbc:clickhouse://192.168.1.33:8123
+ch.source.user_tag.username=default
+ch.source.user_tag.password=Lb5NcL09

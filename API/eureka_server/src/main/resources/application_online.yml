@@ -1,0 +1,14 @@
+server:
+  port: 8000
+
+eureka:
+  instance:
+    hostname: 10.20.124.162:8000
+  client:
+    registerWithEureka: false #用于表明自己是一个Server
+    fetchRegistry: false #用于表明自己是一个Server
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+  server:
+    enableSelfPreservation: false
+    evictionIntervalTimerInMs: 2000

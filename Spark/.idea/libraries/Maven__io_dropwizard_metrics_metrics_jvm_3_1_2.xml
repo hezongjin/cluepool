@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: io.dropwizard.metrics:metrics-jvm:3.1.2">
+    <CLASSES>
+      <root url="jar://H:/软件工厂运行环境/MavenLibs/io/dropwizard/metrics/metrics-jvm/3.1.2/metrics-jvm-3.1.2.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://H:/软件工厂运行环境/MavenLibs/io/dropwizard/metrics/metrics-jvm/3.1.2/metrics-jvm-3.1.2-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://H:/软件工厂运行环境/MavenLibs/io/dropwizard/metrics/metrics-jvm/3.1.2/metrics-jvm-3.1.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

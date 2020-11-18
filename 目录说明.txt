@@ -1,0 +1,7 @@
+CODE-4
+	|-API：API项目
+		|-client_qh：实体API客户端模块
+		|-comm：公共类模块
+		|-ribbon：负载模块
+		|-server：注册中心模块
+	|-Spark：后台数据同步服务

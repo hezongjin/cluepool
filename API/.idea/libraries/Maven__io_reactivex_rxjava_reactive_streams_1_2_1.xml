@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: io.reactivex:rxjava-reactive-streams:1.2.1">
+    <CLASSES>
+      <root url="jar://H:/软件工厂运行环境/MavenLibs/io/reactivex/rxjava-reactive-streams/1.2.1/rxjava-reactive-streams-1.2.1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://H:/软件工厂运行环境/MavenLibs/io/reactivex/rxjava-reactive-streams/1.2.1/rxjava-reactive-streams-1.2.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://H:/软件工厂运行环境/MavenLibs/io/reactivex/rxjava-reactive-streams/1.2.1/rxjava-reactive-streams-1.2.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

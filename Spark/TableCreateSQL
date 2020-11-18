@@ -1,0 +1,26 @@
+#临时需求涉及数据库建表及查询SQL
+
+##业务方指定企业名录表-建表语句
+drop table if exists TEST.TEMP_ENT_NAME;
+CREATE  TABLE TEST.TEMP_ENT_NAME (
+ent_name varchar primary key --企业名称
+);
+
+
+
+
+##潜客企业及联系方式表
+CREATE  TABLE TEST.TEMP_POTENTIAL_CUSTOMER (
+ent_id varchar primary key,--企业标识
+t1_201 integer,
+t4_201 integer,
+t11_201 integer,
+t1_101 integer,
+t1_201an integer,
+ent_name varchar, --企业名称
+ent_phone varchar, --联系电话
+ent_email varchar, --联系邮箱
+ent_con_id varchar, --企业联系信息关联ID
+ent_ad_id varchar, --企业招聘信息关联ID
+ent_info_type integer --企业信息类型，1为外贸门户潜在客户，2为内贸转外贸潜在客户
+);

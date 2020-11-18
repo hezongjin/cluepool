@@ -1,0 +1,15 @@
+eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 1  #每间隔1s，向服务端发送一次心跳，证明自己依然”存活“
+    leaseExpirationDurationInSeconds: 2 #告诉服务端，如果我2s之内没有给你发心跳，就代表我“死”了，将我踢出掉
+  client:
+    serviceUrl:
+      defaultZone: http://10.20.124.162:8000/eureka/
+server:
+  port: 9804
+spring:
+  cloud:
+    discovery:
+      enabled: true
+  application:
+    name: service-ribbon-ywapi

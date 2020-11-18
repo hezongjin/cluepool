@@ -1,0 +1,9 @@
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://10.20.23.14:9801/eureka/
+server:
+  port: 9804
+spring:
+  application:
+    name: service-ribbon-api

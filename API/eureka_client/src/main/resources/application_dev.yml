@@ -1,0 +1,40 @@
+eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 1  #每间隔1s，向服务端发送一次心跳，证明自己依然”存活“
+    leaseExpirationDurationInSeconds: 2 #告诉服务端，如果我2s之内没有给你发心跳，就代表我“死”了，将我踢出掉
+  client:
+    serviceUrl:
+      defaultZone: http://10.12.51.187:9801/eureka/
+server:
+  port: 9802
+
+sys:
+  title: SPRING-CLOUD-CLIENT-01
+
+spring:
+  application:
+    name: service-ywapitest
+  #数据源配置
+  datasource:
+    url: jdbc:mysql://10.12.40.206:3306/App?useUnicode=true&characterEncoding=utf-8
+    username: qhuser
+    password: qhuser
+    driver-class-name: com.mysql.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    connectionProperties: druid.stat.mergeSql=true
+    #verifyServerCertificate: false
+    #useSSL: false
+
+  cache:
+    ehcache:
+        config: /ehcache.xml
+
+mybatis:
+  #实体类所在包
+  type-aliases-package: cn.ce.sui.model
+  #mapper.xml所在位置
+  mapper-locations: classpath:mappers/*.xml
+
+impalaconf:
+  driver: com.cloudera.impala.jdbc41.Driver
+  url: jdbc:impala://10.20.23.23:21050/default

@@ -1,0 +1,9 @@
+# config of online
+es.nodes=10.20.124.146
+es.port=9200
+es.index.auto.create=true
+es.nodes.wan.only=true
+zkUrl=server1,server2,tool:2181:/hbase-unsecure
+
+# out config
+to_es.09.ent_bid_info=SELECT id,bid_project, ent_id, publish_time, won_ent_id, source_name, source_url, modify_time, create_time FROM EDS.T_EDS_ENT_BID_INFO

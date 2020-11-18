@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: javolution:javolution:5.5.1">
+    <CLASSES>
+      <root url="jar://H:/软件工厂运行环境/MavenLibs/javolution/javolution/5.5.1/javolution-5.5.1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://H:/软件工厂运行环境/MavenLibs/javolution/javolution/5.5.1/javolution-5.5.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://H:/软件工厂运行环境/MavenLibs/javolution/javolution/5.5.1/javolution-5.5.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: javax.jdo:jdo-api:3.0.1">
+    <CLASSES>
+      <root url="jar://H:/软件工厂运行环境/MavenLibs/javax/jdo/jdo-api/3.0.1/jdo-api-3.0.1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://H:/软件工厂运行环境/MavenLibs/javax/jdo/jdo-api/3.0.1/jdo-api-3.0.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://H:/软件工厂运行环境/MavenLibs/javax/jdo/jdo-api/3.0.1/jdo-api-3.0.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

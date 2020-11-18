@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="ImpalaJDBC41">
+    <CLASSES>
+      <root url="jar://H:/框架源码/impala_jdbc_2.6.3.1004/ClouderaImpalaJDBC-2.6.3.1004/ClouderaImpalaJDBC41-2.6.3.1004/ImpalaJDBC41.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
