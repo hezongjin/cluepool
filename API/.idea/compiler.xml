@@ -14,10 +14,10 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="eureka_client" target="1.8" />
-      <module name="eureka_comm" target="1.5" />
+      <module name="eureka_comm" target="1.8" />
       <module name="eureka_ribbon" target="1.8" />
       <module name="eureka_server" target="1.8" />
-      <module name="SCAPI" target="1.5" />
+      <module name="SCAPI" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

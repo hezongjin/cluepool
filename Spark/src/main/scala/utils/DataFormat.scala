@@ -26,21 +26,21 @@ object DataFormat {
   private val PATTERN = "[0-9.]{1,}".r
 
   def main(args: Array[String]): Unit = {
-    println("[CD]"+getCurrentDate())
-    println("[CC]"+getOriSign("15321336337"))
-    val tagCount:Int = 3
-    val tagData:String = "普通#-#普通#-#普通"
-    val scoreData:String = "0.71428573#-#0#-#1"
-    val feedData:String = "447456755635453953,447456755635453955,447456758974119938,447456758978314241,447456758990897154,447456758995091457,447456759007674370,447456759011868673,447456760161107968,447692460110381057#-#447456756633698305,456526921941909504#-#447456755635453953,447456755635453955,447456758974119938,447456758978314241,447456758990897154,447456758995091457,447456759007674370,447456759011868673,447456760161107968,447692460110381057"
-    println("[DD]"+getTagRes(tagCount,tagData,scoreData,feedData,SPLIT_KEY))
-    println("[1]"+getLastModifyTime(List("2020-05-28 19:19:19","2020-05-27 19:09:19","2020-05-27 19:59:19","2020-05-27 19:49:19","2020-05-27 19:39:19","2020-05-27 19:29:19")))
+    println("[CD]" + getCurrentDate())
+    println("[CC]" + getOriSign("15321336337"))
+    val tagCount: Int = 3
+    val tagData: String = "普通#-#普通#-#普通"
+    val scoreData: String = "0.71428573#-#0#-#1"
+    val feedData: String = "447456755635453953,447456755635453955,447456758974119938,447456758978314241,447456758990897154,447456758995091457,447456759007674370,447456759011868673,447456760161107968,447692460110381057#-#447456756633698305,456526921941909504#-#447456755635453953,447456755635453955,447456758974119938,447456758978314241,447456758990897154,447456758995091457,447456759007674370,447456759011868673,447456760161107968,447692460110381057"
+    println("[DD]" + getTagRes(tagCount, tagData, scoreData, feedData, SPLIT_KEY))
+    println("[1]" + getLastModifyTime(List("2020-05-28 19:19:19", "2020-05-27 19:09:19", "2020-05-27 19:59:19", "2020-05-27 19:49:19", "2020-05-27 19:39:19", "2020-05-27 19:29:19")))
   }
 
   /**
     * 根据多表修改日期获取最新修改日期
-    * */
-  def getLastModifyTime(data:List[String]):String={
-    val cs = data.sortWith(_<_).reverse
+    **/
+  def getLastModifyTime(data: List[String]): String = {
+    val cs = data.sortWith(_ < _).reverse
     cs(0).toString
   }
 
@@ -52,7 +52,7 @@ object DataFormat {
   def readConf(configFile: String): Properties = {
     val in: InputStream = DataFormat.getClass.getClassLoader.getResourceAsStream(configFile)
     val props = new Properties()
-    props.load(new InputStreamReader(in,"UTF-8"))
+    props.load(new InputStreamReader(in, "UTF-8"))
     in.close()
     props
   }
@@ -84,47 +84,47 @@ object DataFormat {
 
   /**
     * 获取当前时间
-    * */
-  def getCurrentDate():String ={
+    **/
+  def getCurrentDate(): String = {
     new SimpleDateFormat("yyyy-MM-dd").format(new Date())
   }
 
   /**
     * 标签计算函数
-    * */
-  def getTagRes(tagCount:Int,tagData:String,scoreData:String,feedData:String,splitKey:String):String={
+    **/
+  def getTagRes(tagCount: Int, tagData: String, scoreData: String, feedData: String, splitKey: String): String = {
     val tagArr = tagData.split("#-#")
     val scoreArr = scoreData.split("#-#")
     val feedIdArr = feedData.split("#-#")
     var tagSign = ""
     //获取各标签对应feedID的个数
-    val tagFeedRelCount:Array[Int] = new Array[Int](tagCount)
-    var tagFeedIdMaxCount:Int =0
-    var allTagStr:String = ""
+    val tagFeedRelCount: Array[Int] = new Array[Int](tagCount)
+    var tagFeedIdMaxCount: Int = 0
+    var allTagStr: String = ""
     for (i <- 0 to (tagCount - 1)) {
-        tagFeedRelCount.update(i,feedIdArr(i).split(",").length)
-        if(tagFeedIdMaxCount<= feedIdArr(i).split(",").length){
-          tagFeedIdMaxCount = feedIdArr(i).split(",").length
-        }
-        for(k <- 0 to feedIdArr(i).split(",").length-1){
-          allTagStr +=","+feedIdArr(i).split(",")(k)
-        }
+      tagFeedRelCount.update(i, feedIdArr(i).split(",").length)
+      if (tagFeedIdMaxCount <= feedIdArr(i).split(",").length) {
+        tagFeedIdMaxCount = feedIdArr(i).split(",").length
+      }
+      for (k <- 0 to feedIdArr(i).split(",").length - 1) {
+        allTagStr += "," + feedIdArr(i).split(",")(k)
+      }
     }
     //println("[INFO][MAX]"+tagFeedIdMaxCount)
     //println("[INFO][DETAIL]"+tagFeedRelCount.toBuffer)
     if (tagArr.length == tagCount && tagArr.length == scoreArr.length && tagArr.length == feedIdArr.length) {
       var stepNum = 0
-      for(j <- 0 to tagFeedIdMaxCount){
+      for (j <- 0 to tagFeedIdMaxCount) {
         for (i <- 0 to tagCount - 1) {
           if (scoreArr(i).toDouble > 0.5) {
-            if (feedIdArr(i).split(",").length > 1 && stepNum<tagFeedIdMaxCount-1 && stepNum< tagFeedRelCount(i)-1) {
-              tagSign = tagSign + "|" + feedIdArr(i).split(",")(stepNum) + "|" + feedIdArr(i).split(",")(stepNum+1)
-            } else if (feedIdArr(i).split(",").length == 1 && stepNum<tagFeedIdMaxCount && stepNum< tagFeedRelCount(i)) {
+            if (feedIdArr(i).split(",").length > 1 && stepNum < tagFeedIdMaxCount - 1 && stepNum < tagFeedRelCount(i) - 1) {
+              tagSign = tagSign + "|" + feedIdArr(i).split(",")(stepNum) + "|" + feedIdArr(i).split(",")(stepNum + 1)
+            } else if (feedIdArr(i).split(",").length == 1 && stepNum < tagFeedIdMaxCount && stepNum < tagFeedRelCount(i)) {
               tagSign = tagSign + "|" + feedIdArr(i).split(",")(0)
             }
             stepNum += 2
           } else {
-            if (feedIdArr(i).split(",").length >= 1 && stepNum<tagFeedIdMaxCount && stepNum< tagFeedRelCount(i)) {
+            if (feedIdArr(i).split(",").length >= 1 && stepNum < tagFeedIdMaxCount && stepNum < tagFeedRelCount(i)) {
               tagSign = tagSign + "|" + feedIdArr(i).split(",")(stepNum)
             }
             stepNum += 1
@@ -133,42 +133,43 @@ object DataFormat {
       }
     }
     val allTagArr: Array[String] = allTagStr.substring(1).split(",")
-    var tagEndStr:String = "";
-    for (i <- 0 to allTagArr.length-1 ){
-      if(tagSign.indexOf(allTagArr(i)) < 0){
-        tagEndStr +="|"+allTagArr(i)
+    var tagEndStr: String = "";
+    for (i <- 0 to allTagArr.length - 1) {
+      if (tagSign.indexOf(allTagArr(i)) < 0) {
+        tagEndStr += "|" + allTagArr(i)
       }
     }
-    if(tagEndStr.length>0){
-      (tagSign+"|"+tagEndStr.substring(1)).substring(1).split("\\|").distinct.mkString(",").toString
-    }else{
+    if (tagEndStr.length > 0) {
+      (tagSign + "|" + tagEndStr.substring(1)).substring(1).split("\\|").distinct.mkString(",").toString
+    } else {
       (tagSign).substring(1).split("\\|").distinct.mkString(",").toString
     }
 
   }
+
   /**
     * 用户手机号加密函数
-    * */
-  def getOriSign(codes:String):String={
-    return "12312"//StringCodecUtil.encode(codes,"CRM","F71BC468701B11E7","UTF-8")
+    **/
+  def getOriSign(codes: String): String = {
+    return "12312" //StringCodecUtil.encode(codes,"CRM","F71BC468701B11E7","UTF-8")
   }
 
   /**
     * 增量任务解析函数
-    * */
-  def getTaskInfo(taskOri:String,taskSQL:String):Tuple6[String,String,String,String,String,String]={
-    val taskInfo:Array[String] = taskOri.split("\\.")
-    val taskNo:String = taskInfo(1).toString
-    val taskName:String = taskInfo(3).toString
-    val taskDetail:Array[String] = taskInfo(2).split("_")
-    val taskDB:String = taskDetail(1).toString
-    val taskType:String = taskDetail(2).toString
-    val taskOptType:String = taskDetail(0).toString
-    (taskNo,taskName,taskDB,taskType,taskOptType,taskSQL)
+    **/
+  def getTaskInfo(taskOri: String, taskSQL: String): Tuple6[String, String, String, String, String, String] = {
+    val taskInfo: Array[String] = taskOri.split("\\.")
+    val taskNo: String = taskInfo(1).toString
+    val taskName: String = taskInfo(3).toString
+    val taskDetail: Array[String] = taskInfo(2).split("_")
+    val taskDB: String = taskDetail(1).toString
+    val taskType: String = taskDetail(2).toString
+    val taskOptType: String = taskDetail(0).toString
+    (taskNo, taskName, taskDB, taskType, taskOptType, taskSQL)
   }
 
   /**
-    *注册资金单位转换函数
+    * 注册资金单位转换函数
     */
   def parseFunction(it: Row): Array[String] = {
     val resultList = ListBuffer[String]()
@@ -180,8 +181,8 @@ object DataFormat {
       val reg_caps: String = trim(getVal(row, "reg_caps"))
       val reg_caps_unit: String = trim(getVal(row, "reg_caps_unit")).replaceAll("!|-", "")
       //
-      var reg_caps3 = reg_caps
-      var reg_caps_unit3 = reg_caps_unit
+      var reg_caps3 = reg_caps //金额
+      var reg_caps_unit3 = reg_caps_unit //单位
       //
       val capUnit = extract(reg_caps3) // 本来是数字
       val capUnit2 = extract(reg_caps_unit3) // 本来是单位
@@ -421,7 +422,7 @@ object DataFormat {
 
   /**
     * 获取字段值
-    * */
+    **/
   def getVal(row: Row, field: String): String = {
     val v: Object = row.getAs(field)
     if (v == null)
@@ -429,9 +430,10 @@ object DataFormat {
     else
       v.toString
   }
+
   /**
     * 格式化企业注册资金表字段
-    * */
+    **/
   def createEtl4CapitalSchema(): ListBuffer[String] = {
     var fieldList = new ListBuffer[String]()
     fieldList += "ent_id"
@@ -442,9 +444,10 @@ object DataFormat {
     fieldList += "simple_unit"
     fieldList
   }
+
   /**
     * 行数据转换
-    * */
+    **/
   def toRow(data: String): Row = {
     Row.fromSeq(data.split(Comm.SEP, -1))
   }

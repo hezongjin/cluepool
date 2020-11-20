@@ -30,17 +30,21 @@ object SynAllDataV1 {
     * 服务启动函数
     **/
   def main(args: Array[String]): Unit = {
+
     //获取处理类型，TAG为计算标签，LOAD为同步数据
     val optType: String = args(0)
 
     //全量索引后缀
     val esIncEndness: String = "2020-11-13"
+
     //读取并加载项目配置文件
     val confData: Properties = DataFormat.readConf(CONFIG_FILE)
     println(confData.getProperty("es.nodes"))
+
     //加载增量处理任务
     val taskList: Array[AnyRef] = confData.keySet().toArray().filter(k => k.toString.startsWith("INC_TASK."))
       .sortWith((q, h) => q.toString.substring(9, 11) < h.toString.substring(9, 11))
+
     //设置SparkSQL配置（测试时，启用本地模式）
     val conf = new SparkConf().setAppName(SynAllDataV1.getClass.getName)
       //.setMaster("local[2]")//本地调试使用，集群模式可删除
@@ -52,10 +56,13 @@ object SynAllDataV1 {
       .set("dfs.client.socket-timeout", "600000")
       .set("hbase.rpc.timeout", "6000000")
       .set("hbase.client.scanner.caching", "100000")
+    //      .setMaster("local[1]")
     //.set("spark.sql.warehouse.dir", "file:///F://PRO_BIGDATA//SparkLearning")//本地调试使用，集群模式可删除
+
     val zkUrl = confData.getProperty("zkUrl", "")
     //创建SparkSession
     //val ss = SparkSession.builder().config(conf).getOrCreate()//本地调试（不支持Hive）
+
     val ss = SparkSession.builder().config(conf).enableHiveSupport().getOrCreate() //线上模式（支持Hive）
     //顺序执行任务（用于任务跟踪）
     println("[TASK Opt Type] [%s]".format(optType))
@@ -84,13 +91,14 @@ object SynAllDataV1 {
     println("[TASK OPT] [START] %s".format(List.fill(200)("-").mkString))
     if (optType.endsWith("TAG")) {
       println("[OPT TYPE] [%s] ".format("标签计算"))
-      if (taskInfo._5.equals("EXTO1")) {
+
+      if (taskInfo._5.equals("EXTO1")) { //todo 这个1是在哪啊
         //源数据转换处理（暂限于 HBASE -> HBASE）
         if (taskInfo._2.equals("T_EDS_ENT_BASE_INFO")) {
           //企业注册资金单位换算清洗(Finished)
           etl4Capital(taskInfo._2, taskInfo._6, ss, zkUrl)
         }
-      } else if (taskInfo._5.equals("SGTO") && taskInfo._1.toInt>24) {
+      } else if (taskInfo._5.equals("SGTO") && taskInfo._1.toInt > 24) {
         //打标签处理（暂限于 HBASE -> HBASE）
         tagOptionDeal(taskInfo._2, taskInfo._6, ss, zkUrl)
       }
@@ -113,10 +121,11 @@ object SynAllDataV1 {
     * 企业注册资金单位换算清洗(CREATE+UPDATE)
     **/
   def etl4Capital(optTable: String, optSQL: String, ss: SparkSession, zkUrl: String): Unit = {
-    val optSourceTable: String = "eds." + optTable
+    val optSourceTable: String = "eds." + optTable //eds.T_EDS_ENT_BASE_INFO
     val optOrderTable: String = "eds_bak.t_eds_ent_base_info_capital"
-    ss.read.format(CFT).options(Map("table" -> optSourceTable, "zkUrl" -> zkUrl)).load().createOrReplaceTempView(optTable)
-    val dfOri = ss.sql(optSQL)
+    ss.read.format(CFT).options(Map("table" -> optSourceTable, "zkUrl" -> zkUrl)).load().createOrReplaceTempView(optTable) //T_EDS_ENT_BASE_INFO
+    val dfOri = ss.sql(optSQL) //select ent_id,reg_caps,reg_caps_unit from t_eds_ent_base_info
+
     val dfMid = dfOri.rdd.flatMap(DataFormat.parseFunction(_)).filter(_ != null)
     val fieldList = DataFormat.createEtl4CapitalSchema()
     val schema = StructType(fieldList.map(f => StructField(f, StringType, true)))
@@ -132,15 +141,16 @@ object SynAllDataV1 {
     **/
   def tagOptionDeal(optTable: String, optSQL: String, ss: SparkSession, zkUrl: String): Unit = {
     println("[ORI SQL]" + optSQL)
-    val optParam: (Set[String], String, String) = Utils.specialHandleSql(optSQL)
+    val optParam: (Set[String], String, String) = Utils.specialHandleSql(optSQL) //set:从hbase读的表,SQL,插入的表
     var dfOri: DataFrame = null
     var tempTable: String = null
-    for (tab <- optParam._1) {
+    for (tab <- optParam._1) { //从hbase读表 并创建临时视图
       tempTable = tab.split("\\.")(1)
       ss.read.format(Comm.CFT).options(Map("table" -> tab, "zkUrl" -> zkUrl)).load().createOrReplaceTempView(tempTable)
     }
     println("[OPT SQL]" + optParam._2)
     dfOri = ss.sql(optParam._2)
+    dfOri.persist()
     val optCount = dfOri.count()
     println("[ORDER TABLE]" + optParam._3)
     if (optCount > 0) {
@@ -155,18 +165,19 @@ object SynAllDataV1 {
     * ES数据同步入库
     **/
   def dataSyn2ES(optTable: String, optSQL: String, ss: SparkSession, zkUrl: String, esIncEndness: String): Unit = {
-    val trueIndex = optTable + "-" + esIncEndness
-    val optParam: (Set[String], String, String) = Utils.specialHandleSql(optSQL)
+    val trueIndex = optTable + "-" + esIncEndness //ent_base_info-2020-11-13  表加上后缀 时间戳
+    val optParam: (Set[String], String, String) = Utils.specialHandleSql(optSQL) //从hbase读的表,SQL,插入的表(ES)
     var tempTable: String = null
     for (tab <- optParam._1) {
       tempTable = tab.split("\\.")(1)
       println("[" + tab + "][" + tempTable + "]")
       ss.read.format(CFT).options(Map("table" -> tab, "zkUrl" -> zkUrl)).load().createOrReplaceTempView(tempTable)
     }
-    val idName = optParam._2.substring(optParam._2.indexOf(" "), optParam._2.indexOf(",")).trim
+    val idName = optParam._2.substring(optParam._2.indexOf(" "), optParam._2.indexOf(",")).trim //SQL的第一个字段 ES的ID
     println("to update index[%s], alias[%s], id field[%s], handle sql:[%s]\n".format(trueIndex, optTable, idName, optParam._2))
     //用于代码跟踪，上线时请删除
-    val dfOri = ss.sql(optParam._2).cache()
+    val dfOri = ss.sql(optParam._2)
+    dfOri.persist()
     //将查询结果转为DataFrame
     val c = dfOri.count()
     println("\tcount:" + c) //用于代码跟踪，上线时请删除
@@ -193,6 +204,7 @@ object SynAllDataV1 {
       ss.read.format(CFT).options(Map("table" -> tab, "zkUrl" -> zkUrl)).load().createOrReplaceTempView(tempTable)
     }
     val dfOri = ss.sql(optParam._2)
+    dfOri.persist()
     if (tagHead.equals("101_")) {
       val rdd = dfOri.rdd.mapPartitions(iteratorFunction101(_))
       println("to update index for nested,[%s]/[%s][%s]".format(trueIndex, "dtc_101", tagHead))
@@ -208,6 +220,7 @@ object SynAllDataV1 {
     }
     dfOri.unpersist()
   }
+
   def iteratorFunction101(it: Iterator[Row]): Iterator[Nested101] = {
     val res = ListBuffer[Nested101]()
     while (it.hasNext) {
@@ -288,4 +301,5 @@ object SynAllDataV1 {
   case class Nested101(ent_id: String, dtc_101: Array[Bean5])
 
   case class Nested401(ent_id: String, dtc_401: Array[Bean5])
+
 }
