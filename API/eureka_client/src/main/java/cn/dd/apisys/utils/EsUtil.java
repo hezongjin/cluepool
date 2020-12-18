@@ -107,36 +107,50 @@ public class EsUtil {
 
         return queryBuilder;
     }
-    public static QueryBuilder createQueryBuildersGt(JSONObject json, List<String> filterKey, HashMap<String,String> gtCase) {
-        Set<String> keys = json.keySet();
-        List<CommBuilder> list = new ArrayList<CommBuilder>();
+
+    public static QueryBuilder createQueryBuildersGt(JSONObject json, List<String> filterKey, HashMap<String, String> gtCase) {
+        //dto.getData(), EsUtil.excludeList,gtCase
+        Set<String> keys = json.keySet(); //dataMap
+
+        List<CommBuilder> list = new ArrayList<CommBuilder>();   //dataMap构造的所有queryBuilders
+
         Map<String, List<String>> nestedMap = new HashMap<String, List<String>>();
+
         String[] ks = null;
+
         for (String k : keys) {
-            if (filterKey.contains(k) || StringUtils.isEmpty(k))
+
+            if (filterKey.contains(k) || StringUtils.isEmpty(k)) //filterKey 关键字 _fetch,_sort
                 continue;
-            //
-            ks = k.split("\\.");
-            // 内嵌
+
+            ks = k.split("\\.");   //OR_dtc_101.t1,OR_dtc_101.t2
+
             if (ks.length == 2) {
+                //3个内嵌字段 101 201 401
                 if (nestedMap.get(ks[0]) == null)
                     nestedMap.put(ks[0], new ArrayList<String>());
+
                 nestedMap.get(ks[0]).add(k);
             } else {
+
+                //非嵌套结构
                 build(list, k, json.get(k));
             }
         }
 
-        //
-        if (!nestedMap.isEmpty()) {
+
+        //所有的可以遍历过后
+        if (!nestedMap.isEmpty()) {     //嵌套字段
             Set<String> tmpKeys = nestedMap.keySet();
             for (String k : tmpKeys)
+                //接入嵌套的处理
                 buildNested(list, k, nestedMap.get(k), json);
         }
 
         if (list.isEmpty())
             return null;
 
+        //所有dataMap处理的queryBuilders
         BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
         for (CommBuilder qb : list) {
             if (qb.getType() == CommBuilder.Type.FILTER)
@@ -144,9 +158,12 @@ public class EsUtil {
             else
                 queryBuilder.must(qb.getQueryBuilder());
         }
+
+        //gtCase 后来接入的条件 估计是原来的看不懂 又新加了一个map
         RangeQueryBuilder rangeQueryBuilder = QueryBuilders
                 .rangeQuery(gtCase.get("key_lastModify"))
                 .from(gtCase.get("value_lastModify"));
+
         //增加一个注册时间
         if (gtCase.get("key_estimate_date") != null) {
             RangeQueryBuilder rangeQueryBuilder2 = QueryBuilders
@@ -154,6 +171,7 @@ public class EsUtil {
                     .from(gtCase.get("value_estimate_date"));
             queryBuilder.must(rangeQueryBuilder2);
         }
+
         //增加根据传参指令进行省市区为空检索(2020-11-10)
         /* 张嵩跟业务方再次确认后，此逻辑屏蔽
         if(gtCase.get("filterArea").trim().equals("ON")) {
@@ -164,7 +182,9 @@ public class EsUtil {
         */
         return queryBuilder.must(rangeQueryBuilder);
     }
-    public static QueryBuilder createQueryBuildersReal(JSONObject json, List<String> filterKey, HashMap<String,Object> realCase) {
+
+
+    public static QueryBuilder createQueryBuildersReal(JSONObject json, List<String> filterKey, HashMap<String, Object> realCase) {
         Set<String> keys = json.keySet();
         List<CommBuilder> list = new ArrayList<CommBuilder>();
         Map<String, List<String>> nestedMap = new HashMap<String, List<String>>();
@@ -193,29 +213,42 @@ public class EsUtil {
                 queryBuilder.must(qb.getQueryBuilder());
         }
         //System.out.println("[KKK]"+realCase.get("real_ori").toString()+"WWW"+realCase.get("real_ori_val").toString());
-        TermsQueryBuilder rangeQueryBuilder = QueryBuilders.termsQuery(realCase.get("real_ori").toString(),(List<String>) realCase.get("real_ori_val"));
+        TermsQueryBuilder rangeQueryBuilder = QueryBuilders.termsQuery(realCase.get("real_ori").toString(), (List<String>) realCase.get("real_ori_val"));
 
         return queryBuilder.must(rangeQueryBuilder);
     }
 
+    /**
+     * 增加一个queryBuilders 非嵌套结构的
+     * 例如:"reg_status_code": "1","ent_protect_status": "0"
+     *
+     * @param builderList 所有的queryBuilders的集合
+     * @param key         dataMap的Key
+     * @param objValue    这个key对应的value
+     */
     private static void build(List<CommBuilder> builderList, String key, Object objValue) {
+
         if (objValue == null)
             return;
 
         String val = null;
+
         if (objValue instanceof String) {
             val = objValue.toString();
+
             if (StringUtils.isEmpty(val))
                 return;
             //
-            if (val.charAt(0) == '*') {
+            if (val.charAt(0) == '*') { //ent_name2
                 // builderList.add(CommBuilder.build(CommBuilder.Type.DEF, QueryBuilders.matchQuery(key, val.substring(1))));
+                //新增一个企业名称模糊查询的queryBuilders
                 builderList.add(CommBuilder.build(CommBuilder.Type.DEF, QueryBuilders.wildcardQuery(key, val)));
             } else {
+                //"dtc_201_t22": "2","reg_status_code": "1"
                 builderList.add(assistTermsQuery(key, toList(val, key.startsWith("dtc_"))));
             }
         } else {
-            // 这个基本用不到
+            // 这个基本用不到 不是字符串 那是什么?
             builderList.add(CommBuilder.build(CommBuilder.Type.DEF, QueryBuilders.termQuery(key, objValue)));
         }
     }
@@ -226,7 +259,9 @@ public class EsUtil {
      * @return
      */
     private static List<Object> toList(String val, boolean isNumeral) {
+        //exclusiveAreaCodeList 1234|2345|3456
         String[] vals = val.split("\\|");
+
         List<Object> list = new ArrayList<Object>();
         for (String v : vals) {
             if (StringUtils.isEmpty(v))
@@ -243,17 +278,19 @@ public class EsUtil {
 
 
     /**
-     * @param key
-     * @param vals
+     * @param key  dataMap的某一个可以
+     * @param vals 这个key对应的value 用|分割的list
      * @return
      */
     private static CommBuilder assistTermsQuery(String key, List<Object> vals) {
+
         CommBuilder cb = assistTermsQueryBase(key, vals);
         if (cb != null)
             return cb;
 
         // 权重判断,并判断多个字段的情况
         // BOOST|511321|511322|BOOST|511000|511001
+        // BOOST|511321|511322|BOOST|511000|511001|BOOST| //vals list
         int first = vals.indexOf(BOOST);
         int last = vals.lastIndexOf(BOOST);
 
@@ -381,6 +418,7 @@ public class EsUtil {
         }
         return tag;
     }
+
     private static void bulkBatchUpdate(BulkRequest bulkRequest) throws IOException {
         RestHighLevelClient restClient = ElasticSearchPoolUtil.getClient();
         BulkResponse responses = restClient.bulk(bulkRequest, RequestOptions.DEFAULT);

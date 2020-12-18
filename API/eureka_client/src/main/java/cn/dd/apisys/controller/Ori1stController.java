@@ -87,6 +87,10 @@ public class Ori1stController {
         if (reqData.getLabelList() == null)
             reqData.setLabelList(new ArrayList<Map<String, String>>());
 
+        /**
+         * tableHeadList 是要返回的字段值
+         * labelList 里面是增加要查询的条件
+         */
         //增加参数判断,增加默认的条件
         if (reqData.getLabelList() != null) {
             if ("1".equals(reqData.getContactInfoSign())) {
@@ -112,6 +116,7 @@ public class Ori1stController {
         dataMap.put("cnei_sec_code", reqData.getCneiSecCodeList());
         dataMap.put("reg_status_code", "1");
         dataMap.put("ent_protect_status", "0");
+
         HashMap<String, String> gtCase = new HashMap<>();
         gtCase.put("key_lastModify", "last_modify_time");
         gtCase.put("value_lastModify", TimeUse.getDateStr());
@@ -127,7 +132,7 @@ public class Ori1stController {
         //是否过滤区域编码（2020-11-10天极爱）
         gtCase.put("filterArea", "ON");
         if (reqData.getFilterArea() != null) {
-            if(!reqData.getFilterArea().equals("0")){
+            if (!reqData.getFilterArea().equals("0")) {
                 gtCase.put("filterArea", "OFF");
             }
 
@@ -179,8 +184,8 @@ public class Ori1stController {
         newDto.setPageNum(reqData.getPageNum());
         newDto.setPageSize(reqData.getPageSize());
         newDto.setData((JSONObject) JSON.toJSON(dataMap));
-        System.out.println("1111"+JSON.toJSONString(newDto));
-        System.out.println("2222"+JSON.toJSONString(gtCase));
+        System.out.println("1111" + JSON.toJSONString(newDto));
+        System.out.println("2222" + JSON.toJSONString(gtCase));
 
         /*
         try {
@@ -395,6 +400,7 @@ public class Ori1stController {
 
     /**
      * 一号线索池-接口2
+     *
      * @param
      * @return com.alibaba.fastjson.JSONObject
      * @description: 营销管理-企业详情-企业基本信息(多表)
@@ -511,6 +517,7 @@ public class Ori1stController {
 
     /**
      * 一号线索池-接口10
+     *
      * @param
      * @return com.alibaba.fastjson.JSONObject
      * @description: 营销管理-企业详情-企业基本信息(多表)
@@ -612,6 +619,7 @@ public class Ori1stController {
 
     /**
      * 一号线索池-接口15
+     *
      * @param
      * @return com.alibaba.fastjson.JSONObject
      * @description: 营销管理-企业详情-按名称精确查询企业基本信息
@@ -631,7 +639,8 @@ public class Ori1stController {
             respResErr.put("code", 502);
             respResErr.put("useTime", timeUse.end());
             return (JSONObject) JSON.toJSON(respResErr);
-        }       if (StringUtils.isEmpty(dto.getEnt_name())) {
+        }
+        if (StringUtils.isEmpty(dto.getEnt_name())) {
             //System.out.println("请求参数[phoneNum]必须非空");
             respResErr.put("msg", "请求参数[ent_name]必须非空");
             respResErr.put("code", 502);
@@ -1392,6 +1401,7 @@ public class Ori1stController {
 
     /**
      * 一号线索池-接口14
+     *
      * @param
      * @return com.alibaba.fastjson.JSONObject
      * @description: 营销管理-企业详情-相关企业-股东信息

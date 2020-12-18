@@ -12,7 +12,9 @@ import java.io.Serializable;
  * Description:
  */
 public class EntCommonEntity extends BaseEntity implements Serializable {
+
     private JSONObject data;
+
 
     public JSONObject getData() {
         return data;

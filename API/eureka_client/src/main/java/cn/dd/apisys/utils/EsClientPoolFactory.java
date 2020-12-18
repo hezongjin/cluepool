@@ -52,8 +52,8 @@ public class EsClientPoolFactory implements PooledObjectFactory<RestHighLevelCli
             //HttpHost[] hosts = new HttpHost[1];
             //hosts[0] = new HttpHost("10.20.124.146", 9200, "http");
             //client = new RestHighLevelClient(RestClient.builder(hosts));
-            //String address = "10.12.52.174:9200,10.12.52.175:9200,10.12.52.176:9200";
-            String address = "10.20.124.146:9200,10.20.124.147:9200,10.20.124.148:9200";
+            String address = "10.12.52.174:9200,10.12.52.175:9200,10.12.52.176:9200";
+//            String address = "10.20.124.146:9200,10.20.124.147:9200,10.20.124.148:9200";
             if (!"".equals(address) && address != null) {
                 String addressArr[] = address.split(",");
                 HttpHost[] hosts = new HttpHost[addressArr.length];
